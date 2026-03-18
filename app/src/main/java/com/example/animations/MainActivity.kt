@@ -63,6 +63,7 @@ fun AnimatedVisibilityExample() {
 
         AnimatedVisibility(visible) {
             CircularRevealExample()
+
         }
     }
 }
@@ -137,10 +138,19 @@ fun GraphicsLayerExample() {
 @Composable
 fun CircularRevealExample() {
     val radius = remember { Animatable(0f) }
+    var rotation by remember { mutableStateOf(0f) }//per la rotacio
 
     LaunchedEffect(Unit) {
         radius.animateTo(500f, tween(1000))
     }
+//afegeixo efecte de rotacio
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(16)
+            rotation += 2f
+        }}
+    //Poso un box per poder posar el nom
+    Box(modifier = Modifier.fillMaxSize().graphicsLayer(rotationZ = rotation)){
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         clipPath(Path().apply {
@@ -149,6 +159,18 @@ fun CircularRevealExample() {
             drawRect(Color.Cyan)
         }
     }
+    Text(text = "Cristian",
+    modifier = Modifier.align(Alignment.Center),
+    color = Color.Black)}
+
+}
+
+
+
+fun Modifier.Companion.align(center: Alignment): Modifier {
+
+
+    return TODO("Provide the return value")
 }
 
 
