@@ -5,7 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +23,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -43,7 +50,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppContent() {
-    Column {
+    Column (modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 80.dp))//Afegeixo una mica d'espai a dalt perque no se solapi el text amb la hora i tal
+    {
+
         Text("Benvingut a l'app d'animacions!")
         AnimatedVisibilityExample()
         //AnimatedContentExample()
@@ -140,6 +151,28 @@ fun CircularRevealExample() {
     val radius = remember { Animatable(0f) }
     var rotation by remember { mutableStateOf(0f) }//per la rotacio
 
+    // infinit de color
+    val infiniteTransition = rememberInfiniteTransition()
+
+    val color by infiniteTransition.animateColor(
+        initialValue = Color.White,
+        targetValue = Color.Black,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+//Afegeixo un infinite perque doni voltes al eix Y i per tant es mogui
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = -100f,
+        targetValue = 100f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500),
+            repeatMode = RepeatMode.Reverse
+        )
+
+    )
+
     LaunchedEffect(Unit) {
         radius.animateTo(500f, tween(1000))
     }
@@ -149,19 +182,20 @@ fun CircularRevealExample() {
             delay(16)
             rotation += 2f
         }}
-    //Poso un box per poder posar el nom
-    Box(modifier = Modifier.fillMaxSize().graphicsLayer(rotationZ = rotation)){
+    //Poso un box per poder posar el nom també amb el offset faig la translacio peruq es mogui de dalt a baix
+    Box(modifier = Modifier.fillMaxSize().offset(y = offsetY.dp).graphicsLayer(rotationZ = rotation)){
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         clipPath(Path().apply {
             addOval(Rect(center = Offset(size.width / 2, size.height / 2), radius = radius.value))
         }) {
-            drawRect(Color.Cyan)
+            //poso color que és el infinite i trec el cyan d'abans
+            drawRect(color)
         }
     }
     Text(text = "Cristian",
     modifier = Modifier.align(Alignment.Center),
-    color = Color.Black)}
+    color = Color.Blue)}
 
 }
 
